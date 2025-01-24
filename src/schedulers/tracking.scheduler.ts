@@ -17,8 +17,8 @@ export class TrackingScheduler {
 
   private async run(): Promise<void> {
     logger.info('Getting all order trackings');
-    const carriers = await this.orderTrackingRepository.getAllOrderTracking();
-
+    // const carriers = await this.orderTrackingRepository.getAllOrderTracking();
+    const carriers = [];
     for (const carrier of carriers) {
       logger.info(`Starting update of order events for carrier ${carrier.trackingCode}`);
 
@@ -36,12 +36,13 @@ export class TrackingScheduler {
         );
       }
     }
+    logger.info('All orders finished!!');
   }
 
   public static start(): void {
     const scheduler = new TrackingScheduler();
-    schedule.scheduleJob('*/5 * * * *', async () => {
-      logger.info('Running tracking scheduler');
+    logger.info('Running tracking scheduler');
+    schedule.scheduleJob('*/1 * * * *', async () => {
       await scheduler.run();
     });
   }

@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 
 import MongooseHelper from './config/database';
 import { logger } from './config/logger';
-// import { TrackingScheduler } from './schedulers/tracking.scheduler';
+import { TrackingScheduler } from './schedulers/tracking.scheduler';
 // import NotificationConsumer from './consumers/notification.consumer';
 
 dotenv.config();
@@ -19,8 +19,8 @@ mongooseHelper
       logger.info(`Server is running in port ${defaultPort}`);
     });
 
-    // logger.info('Starting Tracking Scheduler...');
-    // TrackingScheduler.start();
+    logger.info('Starting Tracking Scheduler...');
+    TrackingScheduler.start();
 
     // logger.info('Starting notification cosumer');
     // const notificationConsumer = new NotificationConsumer();
