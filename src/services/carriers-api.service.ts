@@ -12,7 +12,6 @@ export default class CarriersApiService {
         },
       }
     );
-    const newData = carrierApiTransform(data);
-    return newData;
+    return carrierApiTransform(data);
   }
 }

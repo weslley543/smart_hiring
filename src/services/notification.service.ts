@@ -37,6 +37,7 @@ export default class NotificationService {
           },
         ],
       });
+      this.producer.disconnect();
       logger.info(`Message successfully sent to topic ${topic}: ${JSON.stringify(updatedCarrier)}`);
     } catch (error) {
       logger.error(`Failed to send message to topic ${topic}:`, error);
