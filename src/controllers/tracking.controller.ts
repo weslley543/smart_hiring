@@ -7,11 +7,11 @@ export default class TrackingController {
     const { trackingCode } = request.params;
     const saveCarrierService = new SaveCarrierService();
     try {
-      const newCarrier = saveCarrierService.execute(trackingCode);
+      const newCarrier = await saveCarrierService.execute(trackingCode);
 
       response.status(201).json(newCarrier);
     } catch (error) {
-      const status = error?.status ? error.status : 500;
+      const status = error?.statusCode ? error.statusCode : 500;
       const message = error?.message ? error.message : 'Internal Server Error';
       response.status(status).json({ message });
     }

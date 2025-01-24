@@ -1,6 +1,8 @@
-import { KafkaMessage, Producer } from 'kafkajs';
+import { v4 as uuidv4 } from 'uuid';
+import { Producer } from 'kafkajs';
 import kafka from '../config/kafka';
 import { logger } from '../config/logger';
+import { OrderTracking } from 'types/order-tracking';
 
 export default class NotificationService {
   private producer: Producer;
@@ -19,7 +21,7 @@ export default class NotificationService {
     }
   }
 
-  public async notify(message: KafkaMessage): Promise<void> {
+  public async notify(updatedCarrier: OrderTracking): Promise<void> {
     const topic = process.env.KAFKA_TOPIC;
     if (!topic) {
       throw new Error('Kafka needs a topic');
@@ -28,9 +30,14 @@ export default class NotificationService {
       await this.connectProducer();
       await this.producer.send({
         topic,
-        messages: [message],
+        messages: [
+          {
+            key: uuidv4(),
+            value: JSON.stringify(updatedCarrier),
+          },
+        ],
       });
-      logger.info(`Message successfully sent to topic ${topic}: ${JSON.stringify(message)}`);
+      logger.info(`Message successfully sent to topic ${topic}: ${JSON.stringify(updatedCarrier)}`);
     } catch (error) {
       logger.error(`Failed to send message to topic ${topic}:`, error);
     }

@@ -1,4 +1,5 @@
 import { OrderTrackingModel } from '../models/tracking.model';
+import { TrackingStatus } from '../enums/enum-tracking-status';
 import { OrderTracking, OrderTrackingDocument } from '../types/order-tracking';
 
 export class OrderTrackingRepository {
@@ -14,8 +15,8 @@ export class OrderTrackingRepository {
     return OrderTrackingModel.find({
       events: {
         $not: {
-          $elemenMatch: {
-            status: 'Entregue',
+          $elemMatch: {
+            status: TrackingStatus.DELIVERY_COMPLETED,
           },
         },
       },

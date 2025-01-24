@@ -1,4 +1,5 @@
 import schedule from 'node-schedule';
+
 import { logger } from '../config/logger';
 import CarriersApiService from '../services/carriers-api.service';
 import { OrderTrackingRepository } from '../repositories/order-tracking.repository';
@@ -17,17 +18,20 @@ export class TrackingScheduler {
 
   private async run(): Promise<void> {
     logger.info('Getting all order trackings');
-    // const carriers = await this.orderTrackingRepository.getAllOrderTracking();
-    const carriers = [];
+    const carriers = await this.orderTrackingRepository.getAllOrderTracking();
+
     for (const carrier of carriers) {
       logger.info(`Starting update of order events for carrier ${carrier.trackingCode}`);
 
       try {
         const trackingData = await this.carriersApiService.getTrackingInfo(carrier.trackingCode);
 
-        await this.orderTrackingRepository.updateTracking(carrier.trackingCode, trackingData);
+        const updatedCarrier = await this.orderTrackingRepository.updateTracking(
+          carrier.trackingCode,
+          trackingData
+        );
 
-        // await this.notificationService.notify(trackingData);
+        await this.notificationService.notify(updatedCarrier);
 
         logger.info(`Successfully updated order events for carrier ${carrier.trackingCode}`);
       } catch (error) {
@@ -39,11 +43,20 @@ export class TrackingScheduler {
     logger.info('All orders finished!!');
   }
 
-  public static start(): void {
+  public static async start(): Promise<void> {
     const scheduler = new TrackingScheduler();
     logger.info('Running tracking scheduler');
-    schedule.scheduleJob('*/1 * * * *', async () => {
-      await scheduler.run();
-    });
+
+    try {
+      schedule.scheduleJob('*/1 * * * *', async () => {
+        try {
+          await scheduler.run();
+        } catch (error) {
+          logger.error(`Error occurred during scheduled task execution: ${error.message}`);
+        }
+      });
+    } catch (error) {
+      logger.error(`Failed to start the tracking scheduler: ${error.message}`);
+    }
   }
 }

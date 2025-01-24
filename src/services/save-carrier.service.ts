@@ -1,3 +1,4 @@
+import { BadRequestError, ConflictError } from '../errors';
 import { OrderTrackingRepository } from '../repositories/order-tracking.repository';
 import { OrderTracking } from '../types/order-tracking';
 import CarriersApiService from './carriers-api.service';
@@ -14,16 +15,16 @@ export default class SaveCarrierService {
     const tracking = await this.orderTrackingRepository.getByTrackingCode(trackingCode);
 
     if (tracking) {
-      throw new Error('Tracking already registred!');
+      throw new ConflictError('Tracking already registred!');
     }
 
     const carriers = await this.carriersApiService.getTrackingInfo(trackingCode);
 
     if (!carriers) {
-      throw new Error('Error to get carrier data');
+      throw new BadRequestError('Error to get carrier data');
     }
 
-    const newOrderTracking = this.orderTrackingRepository.add(carriers);
+    const newOrderTracking = await this.orderTrackingRepository.add(carriers);
 
     return newOrderTracking;
   }

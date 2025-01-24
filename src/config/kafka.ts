@@ -1,10 +1,10 @@
 import { Kafka } from 'kafkajs';
 
 const kafka = new Kafka({
-  clientId: 'tracking-service',
-  brokers: ['localhost:9092'],
+  clientId: process.env.KAFKA_CLIENT_ID,
+  brokers: [process.env.KAFKA_CONNECTION_STRING],
   retry: {
-    retries: 5,
+    retries: Number(process.env.KAFKA_RETRIES) || 5,
   },
 });
 
